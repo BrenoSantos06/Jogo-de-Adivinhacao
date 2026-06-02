@@ -14,6 +14,15 @@ public interface Jogo extends Remote {
     int obterTurno()
             throws RemoteException;
 
+    boolean jogoPronto()
+            throws RemoteException;
+
     boolean jogoEncerrado()
+            throws RemoteException;
+
+    boolean entrar(int jogador)
+            throws RemoteException;
+
+    void reiniciarJogo()
             throws RemoteException;
 }

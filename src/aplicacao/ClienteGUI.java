@@ -19,9 +19,11 @@ public class ClienteGUI extends JFrame {
 
     private JButton botaoEnviar;
 
-    private Jogo jogo;
+    private aplicacao.Jogo jogo;
 
     private int jogador = 0;
+
+    private JButton botaoReiniciar;
 
     public ClienteGUI() {
 
@@ -147,9 +149,16 @@ public class ClienteGUI extends JFrame {
 
         botaoEnviar.setEnabled(false);
 
+        botaoReiniciar =
+                new JButton("JOGAR NOVAMENTE!");
+
+        botaoReiniciar.setEnabled(false);
+
         baixo.add(labelStatus);
 
         baixo.add(botaoEnviar);
+
+        baixo.add(botaoReiniciar);
 
         painel.add(baixo,
                 BorderLayout.SOUTH);
@@ -164,6 +173,10 @@ public class ClienteGUI extends JFrame {
 
         botaoEnviar.addActionListener(
                 e -> enviar()
+        );
+
+        botaoReiniciar.addActionListener(
+                e -> reiniciar()
         );
 
         setVisible(true);
@@ -231,6 +244,33 @@ public class ClienteGUI extends JFrame {
                 JOptionPane.showMessageDialog(
                         this,
                         "O jogador deve ser 1 ou 2."
+                );
+
+                return;
+            }
+
+            boolean conectado;
+
+            try {
+
+                conectado =
+                        jogo.entrar(valor);
+
+            } catch (Exception e) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Erro de conexão."
+                );
+
+                return;
+            }
+
+            if (!conectado) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Esse jogador já está em uso."
                 );
 
                 return;
@@ -305,12 +345,26 @@ public class ClienteGUI extends JFrame {
                             jogador
                     );
 
+            if (
+                    resposta.equals(
+                            "AGUARDANDO_JOGADORES"
+                    )
+            ) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Aguardando outro jogador conectar."
+                );
+            }
+
             if (resposta.equals("VENCEU")) {
 
                 JOptionPane.showMessageDialog(
                         this,
                         "VOCÊ VENCEU!"
                 );
+
+                botaoReiniciar.setEnabled(true);
             }
 
             if (resposta.equals("JOGADOR_INVALIDO")) {
@@ -330,6 +384,7 @@ public class ClienteGUI extends JFrame {
                     "Erro ao enviar palpite."
             );
         }
+
     }
 
     private void iniciarAtualizacao() {
@@ -350,6 +405,22 @@ public class ClienteGUI extends JFrame {
             areaHistorico.setText(
                     jogo.obterHistorico()
             );
+
+            if (!jogo.jogoPronto()) {
+
+                labelStatus.setText(
+                        "Aguardando jogadores..."
+                );
+
+                return;
+            }
+
+            if (jogo.jogoPronto()) {
+
+                labelStatus.setText(
+                        "Partida iniciada!"
+                );
+            }
 
             if (jogador != 0) {
 
@@ -393,6 +464,8 @@ public class ClienteGUI extends JFrame {
                     campoPalpite.setEnabled(false);
 
                     botaoEnviar.setEnabled(false);
+
+                    botaoReiniciar.setEnabled(true);
                 }
             }
 
@@ -400,6 +473,28 @@ public class ClienteGUI extends JFrame {
 
             labelStatus.setText(
                     "Erro de conexão"
+            );
+        }
+    }
+
+    private void reiniciar() {
+
+        try {
+
+            jogo.reiniciarJogo();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Novo jogo iniciado!"
+            );
+
+            botaoReiniciar.setEnabled(false);
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erro ao reiniciar."
             );
         }
     }
